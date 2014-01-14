@@ -13,11 +13,14 @@ import roboguice.inject.InjectView
 
 import jp.mydns.sys1yagi.kotlin.R
 import jp.mydns.sys1yagi.kotlin.tools.RDF;
+import jp.mydns.sys1yagi.kotlin.views.RssAdapter;
 import android.widget.ArrayAdapter
 import android.content.Context
 import android.widget.AdapterView.OnItemClickListener
 import android.widget.AdapterView
 import android.widget.Adapter
+import android.content.Intent
+import android.net.Uri
 
 public open class RssFragment() : RoboFragment() {
     [InjectView(R.id.item_list)] var mListView: ListView? = null
@@ -41,13 +44,14 @@ public open class RssFragment() : RoboFragment() {
         RDF.load(mUrl, { items ->
             getActivity()?.runOnUiThread(Runnable {
                 run {
-                    val adapter: ArrayAdapter<String> = ArrayAdapter<String>(getActivity() as Context, android.R.layout.simple_list_item_1, android.R.id.text1)
+                    val adapter = RssAdapter(getActivity() as Context)
                     for (item in items) {
-                        adapter.add(item.title)
+                        adapter.add(item)
                     }
                     mListView?.setAdapter(adapter)
                     mListView?.setOnItemClickListener { parent, view, position, id ->
-
+                        val item = parent?.getItemAtPosition(position) as RDF.Item
+                        Intent(Intent.ACTION_VIEW, Uri.parse(item.link!!)).startActivity(getActivity())
                     }
                 }
             })
