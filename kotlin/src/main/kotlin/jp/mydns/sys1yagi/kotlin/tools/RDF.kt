@@ -1,4 +1,4 @@
-package jp.mydns.sys1yagi.kotlin
+package jp.mydns.sys1yagi.kotlin.tools
 
 import kotlin.dom.*
 import java.util.List
@@ -19,13 +19,10 @@ object RDF{
             var content: String? = null,
             var date: String? = null
     )
-    fun load(url: String, listener: (List<Item>) -> Unit): Unit {
+    fun load(url: String?, listener: (List<Item>) -> Unit): Unit {
         Thread() {
             run {
-                val client = URL(url).openConnection()
-                val stream = client?.getInputStream() as InputStream
-                val document = parseXml(stream)
-                stream.close()
+                val document = parseXml(URL(url).openConnection()?.getInputStream() as InputStream)
 
                 val items = document.getElementsByTagName("item")!!
                 val list = ArrayList<Item>()
@@ -35,6 +32,7 @@ object RDF{
                         list.add(item)
                     }
                 }
+
                 listener(list as List<Item>)
             }
         }.start()
